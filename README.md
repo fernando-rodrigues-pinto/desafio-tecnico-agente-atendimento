@@ -15,7 +15,7 @@ Documentation is in English; the agent, data and store policies are in Portugues
 **Facts that change come from tools; stable rules live in the prompt.**
 
 - **Operational data** (`data/*.csv`) is accessed through two Python tools called by the LLM via native function calling: product search and order lookup (with identity verification).
-- **Store policies** (`data/políticas_da_loja.pdf`, ~3k tokens) are placed in full in the system prompt, with no retrieval.
+- **Store policies** (`data/policies.pdf`, ~3k tokens) are placed in full in the system prompt, with no retrieval.
 - **Interface:** simple CLI.
 
 ## Repository structure
@@ -52,6 +52,8 @@ _TBD_
 - Preference exchanges: chose 7 calendar days from receipt over counting from purchase because section 4.1, the other 7-day rule, counts that way and customers can't judge a product before receiving it. Limitation: this is an interpretation, and `data/orders.csv` has no actual delivery date, so deadlines can only be estimated.
 - Promotions data: chose to only document discounts in `data/promotions.csv` that fall outside section 6.1, and duplicate rows for products 93, 96 and 99, over validating them in code because all of them are inactive and `search_products` applies only `is_active=1`. Limitation: the file has no dates, so `is_active` is the only validity signal, and the agent can't say when a promotion ended.
 - Orders below the installment minimums (orders 9, 16 and 18): chose to report them as recorded and, if a customer raises one, state the current rule, say the reason is unknown and offer to escalate, over saying the rules may have changed, because all three orders postdate manual version 2.1 (June 2025), so that explanation has no support in the data. Limitation: the customer gets no reason for the difference, and some cases will need staff follow-up.
+- Descriptions of products 135-144: chose, deliberately, to exclude the unreliable descriptions of these products (all basses, drums and keyboards; 7 of the 10 contradict the product name, and all 10 come from the same batch, so they are treated together) at runtime in `search_products` over editing them in the CSV or deactivating the products because, following the initial decision not to alter any of the challenge's original data, editing them would mean inventing content, and deactivating the products would empty 3 categories. Limitation: the ID list is hardcoded and must be reviewed if the data changes.
+- Phone verification: chose to accept numbers with or without +55 but require the area code over an exact digit match because customers often type the country code. Limitation: numbers without area code are rejected.
 
 ## Known limitations and future work
 
