@@ -15,7 +15,7 @@ Documentation is in English; the agent, data and store policies are in Portugues
 **Facts that change come from tools; stable rules live in the prompt.**
 
 - **Operational data** (`data/*.csv`) is accessed through two Python tools called by the LLM via native function calling: product search and order lookup (with identity verification).
-- **Store policies** (`data/políticas_da_loja.pdf`, ~3k tokens) are placed in full in the system prompt, with no retrieval.
+- **Store policies** (`data/policies.pdf`, ~3k tokens) are placed in full in the system prompt, with no retrieval.
 - **Interface:** simple CLI.
 
 ## Repository structure
