@@ -8,7 +8,7 @@ Atendimento ao Cliente
 
 Rua 14 de Maio, 3200 — Centro
 Campo Grande – MS – CEP 79202-333
-(67) 3341-4444 — contato@emporiodamusica.com.br
+(67) 3321-4500 — contato@emporiodamusica.com.br
 
 Versão 2.1 — Junho de 2025
 Documento interno — Uso restrito da equipe de atendimento
@@ -17,7 +17,7 @@ Documento interno — Uso restrito da equipe de atendimento
 
 A Empório da Música é uma loja especializada em instrumentos musicais, fundada em 2008 em Campo Grande, Mato Grosso do Sul. Com mais de 15 anos de atuação no mercado, somos referência regional na venda de instrumentos para músicos iniciantes, intermediários e profissionais.
 
-Nosso catálogo abrange mais de 300 instrumentos de marcas nacionais e internacionais, incluindo guitarras, baixos, violões, baterias, teclados, instrumentos de sopro, cordas orquestrais e ukuleles. Trabalhamos exclusivamente com instrumentos musicais — não comercializamos acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores.
+Nosso catálogo abrange instrumentos de marcas nacionais e internacionais, incluindo guitarras, baixos, violões, baterias, teclados e ukuleles. Trabalhamos exclusivamente com instrumentos musicais — não comercializamos acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores.
 
 ### 1.1 Missão
 
@@ -31,8 +31,8 @@ Democratizar o acesso a instrumentos musicais de qualidade na região Centro-Oes
 | Nome Fantasia | Empório da Música |
 | CNPJ | 12.345.678/0001-90 |
 | Endereço | Rua 14 de Maio, 3200 — Centro, Campo Grande - MS, 79202-333 |
-| Telefone / WhatsApp | (67) 3341-4444 |
-| E-mail | contato@empóriodamusica.com.br |
+| Telefone / WhatsApp | (67) 3321-4500 |
+| E-mail | contato@emporiodamusica.com.br |
 | Fundação | 2008 |
 
 ## 2. Horário de Funcionamento
@@ -55,12 +55,12 @@ Aceitamos as seguintes formas de pagamento para compras presenciais e online:
 | --- | --- | --- |
 | PIX | Pagamento à vista | 5% de desconto sobre o preço de tabela |
 | Cartão de Débito | Pagamento à vista | Todas as bandeiras aceitas |
-| Cartão de Crédito | Até 12x sem juros | Parcela mínima de R$ 100,00 |
+| Cartão de Crédito | Até 12x sem juros | Parcela mínima conforme a seção 3.1 |
 | Boleto Bancário | Pagamento à vista | Compensação em até 3 dias úteis |
 
 ### 3.1 Regras de Parcelamento
 
-- Parcelamento em até 3x: sem juros, sem valor mínimo de parcela (exceto abaixo de R$ 50,00).
+- Parcelamento em até 3x: sem juros, parcela mínima de R$ 50,00.
 - Parcelamento de 4x a 6x: sem juros, parcela mínima de R$ 80,00.
 - Parcelamento de 7x a 12x: sem juros, parcela mínima de R$ 100,00.
 - Combinação de formas de pagamento: permitida (ex.: PIX + cartão) para compras acima de R$ 2.000,00.
@@ -79,12 +79,12 @@ A Empório da Música segue as diretrizes do Código de Defesa do Consumidor (Le
 ### 4.2 Trocas por Defeito
 
 - Produtos com defeito de fabricação podem ser trocados em até 30 (trinta) dias corridos após a compra.
-- Após os 30 dias, o cliente deve acionar a garantia diretamente com o fabricante. A Empório da Música pode intermediar o processo mediante solicitação.
+- Após os 30 dias, aplica-se a garantia legal (seção 8.1) e, depois dela, a garantia do fabricante (seção 8.2). A Empório da Música pode intermediar o processo mediante solicitação.
 - Danos causados por mau uso, quedas, exposição a umidade excessiva ou modificações não autorizadas não são cobertos.
 
 ### 4.3 Trocas por Preferência
 
-- Trocas por preferência (cor, modelo, tamanho) são permitidas em até 7 dias, mediante disponibilidade do produto desejado.
+- Trocas por preferência (cor, modelo, tamanho) são permitidas em até 7 dias corridos após o recebimento, mediante disponibilidade do produto desejado.
 - O produto deve estar em perfeito estado e na embalagem original.
 - Diferenças de valor serão cobradas ou reembolsadas conforme o caso.
 
@@ -98,7 +98,7 @@ A Empório da Música segue as diretrizes do Código de Defesa do Consumidor (Le
 
 ### 5.1 Entregas na Região Metropolitana de Campo Grande
 
-- Frete grátis para pedidos acima de R$ 500,00.
+- Frete grátis para pedidos a partir de R$ 500,00.
 - Para pedidos abaixo de R$ 500,00, taxa fixa de R$ 35,00.
 - Prazo de entrega: 1 a 3 dias úteis.
 - Entrega realizada por motoboy próprio. O cliente será contactado por telefone antes da entrega.
@@ -153,7 +153,7 @@ O canal de WhatsApp (67) 3321-4500 é o principal meio de atendimento remoto da 
 
 **Informações precisas:** nunca fornecer informações sobre preços, estoque ou prazos sem consultar o sistema. Informações incorretas geram frustração e podem configurar propaganda enganosa.
 
-**Escopo:** o atendente deve informar que a loja trabalha exclusivamente com instrumentos musicais. Pedidos de acessórios (cordas, cabos, palhetas, pedais, amplificadores, cases) devem ser educadamente redirecionados. Sugerir lojas parceiras quando possível.
+**Escopo:** o atendente deve informar que a loja trabalha exclusivamente com instrumentos musicais. Pedidos de acessórios (cordas, cabos, palhetas, pedais, amplificadores, cases) devem ser educadamente redirecionados. Não há lojas parceiras cadastradas; não indicar lojas específicas.
 
 ### 7.2 Fluxo de Atendimento Padrão
 
