@@ -1,10 +1,8 @@
 # Store information
 
-> **Known issue:** in the last answer, the agent offers to calculate the shipping cost from the customer's address or product, which it cannot do (there is no shipping tool).
-
 Answers from the policy manual in the system prompt, without tools.
 
-- **Model:** gemini-3.5-flash-lite
+- **Model:** deepseek-flash
 - **Reference date/time:** quarta-feira, 25/03/2026, 10:00
 - **Generated on:** 2026-11-02
 
@@ -14,9 +12,11 @@ Qual o endereço da loja?
 
 ### Assistant
 
-A Empório da Música fica na Rua 14 de Maio, 3200 — Centro, em Campo Grande - MS! 
+A Empório da Música fica na **Rua 14 de Maio, 3200 — Centro, Campo Grande/MS**, CEP 79202-333. Fica bem no centro, fácil de chegar!
 
-Estamos abertos de segunda a sexta-feira, das 09:00 às 18:00, e aos sábados, das 09:00 às 13:00. Quer dar uma olhada em algum instrumento por aí?
+Estamos abertos agora: hoje (quarta) o atendimento vai até as 18h. Se quiser, também pode falar com a gente pelo telefone/WhatsApp (67) 3321-4500.
+
+Posso ajudar em algo mais?
 
 ### Customer
 
@@ -24,7 +24,9 @@ Até que horas vocês abrem no sábado?
 
 ### Assistant
 
-No sábado nós abrimos das 09:00 às 13:00! Passa aqui para dar uma olhada nos nossos instrumentos ou tirar um som com a gente. Precisa de ajuda para encontrar algum modelo específico?
+No sábado a loja abre das **9h às 13h**. 😊
+
+De segunda a sexta o horário é das 9h às 18h. Quer que eu veja algum instrumento pra você já ir dando uma olhada?
 
 ### Customer
 
@@ -32,11 +34,10 @@ Quanto fica o frete para Cuiabá?
 
 ### Assistant
 
-Para entregas em Cuiabá e outras cidades fora da região metropolitana de Campo Grande, nós usamos os Correios (PAC e SEDEX) e a transportadora Jadlog! 
+Para fora de Campo Grande eu não consigo calcular o valor do frete por aqui — ele é calculado com base no CEP de destino, peso e tamanho do instrumento. Mas as modalidades disponíveis são:
 
-Os prazos estimados são:
-- **SEDEX (Correios):** 2 a 5 dias úteis
-- **Jadlog:** 3 a 8 dias úteis
 - **PAC (Correios):** 5 a 12 dias úteis
+- **SEDEX (Correios):** 2 a 5 dias úteis
+- **Jadlog (.package):** 3 a 8 dias úteis
 
-Todas as modalidades incluem seguro e código de rastreamento. Para calcular o valor exato do frete para o seu CEP, basta nos passar o endereço completo ou o produto que você tem interesse!
+Todos com rastreamento e seguro incluídos. Pra saber o valor certinho pro seu CEP em Cuiabá, é só falar com a gente no WhatsApp (67) 3321-4500. 😉

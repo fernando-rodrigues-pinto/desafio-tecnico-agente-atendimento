@@ -1,10 +1,8 @@
 # Return request
 
-> **Known issue:** the agent says the order "foi entregue em 17/02/2026", but that date is only the delivery forecast, and it does not mention that the legal warranty is open until 18/05/2026.
-
 Identity check, order data and return policy combined, with deadlines computed in Python.
 
-- **Model:** gemini-3.5-flash-lite
+- **Model:** deepseek-flash
 - **Reference date/time:** quarta-feira, 25/03/2026, 10:00
 - **Generated on:** 2026-11-02
 
@@ -14,11 +12,7 @@ Me arrependi da minha compra, posso devolver meu pedido?
 
 ### Assistant
 
-E aí! Tudo bem?
-
-Claro, você pode solicitar a devolução por arrependimento em até 7 dias corridos após o recebimento do pedido, desde que o produto esteja na embalagem original, sem sinais de uso e com todos os acessórios e manuais.
-
-Para eu verificar os detalhes da sua compra, me passa por favor o **número do pedido** e o seu **e-mail ou telefone**?
+Claro, posso te ajudar com isso! Pra eu consultar seu pedido, me passa por favor o **número do pedido** e o **e-mail ou telefone** que você usou na compra.
 
 ### Customer
 
@@ -26,12 +20,20 @@ Para eu verificar os detalhes da sua compra, me passa por favor o **número do p
 
 ### Assistant
 
-Letícia, verifiquei aqui que o pedido nº 7 foi entregue em 17/02/2026. 
+Letícia, encontrei seu pedido: **Shelby SU-21S Soprano Sunburst**, entregue com previsão de entrega em 17/02/2026.
 
-Como o prazo de 7 dias corridos para devolução por arrependimento venceu em 24/02/2026, infelizmente não é mais possível fazer a devolução por preferência.
+Sobre o arrependimento, o prazo é de 7 dias corridos após o recebimento — ou seja, ele ia até **24/02/2026** e já está vencido. Então não é mais possível a devolução por desistência.
 
-Se você tiver alguma outra dúvida ou precisar de ajuda com outra coisa, é só falar!
+Os prazos do seu pedido ficaram assim:
+
+- **Desistência / troca por preferência:** até 24/02/2026 — vencido
+- **Troca por defeito:** até 05/03/2026 — vencido
+- **Garantia legal:** até 18/05/2026 — **em aberto**
+
+A garantia legal continua valendo e cobre defeitos de fabricação. Se for esse o caso, fala com nosso time pelo WhatsApp **(67) 3321-4500** pra dar início ao processo.
+
+Posso ajudar em mais alguma coisa?
 
 Tool calls:
 
-- `get_order {"order_id":7,"email_or_phone":"leticia.rocha@jmail.com"}`
+- `get_order {"order_id": 7, "email_or_phone": "leticia.rocha@jmail.com"}`
