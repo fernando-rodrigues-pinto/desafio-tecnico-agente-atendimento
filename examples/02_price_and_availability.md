@@ -1,6 +1,6 @@
 # Price and availability
 
-> **Known issue:** the agent suggests alternatives that are not in the catalog and were not returned by any tool: "Tagima Kansas" and "Rozini RX200" (second answer), and "Gianinni AWN-13" and "Takamine GC1" (third answer; the catalog only has the Takamine GC1CE).
+> **Known issue:** for the discontinued Shelby SN-7C, the tool returned 3 available alternatives, but the agent did not offer them and only offered to show other models. No product is invented: the alternatives in the second answer are the ones computed by the tool.
 
 Price of a specific product, an out-of-stock product and a discontinued product, with alternatives.
 
@@ -14,13 +14,13 @@ Quanto custa o Takamine GD20?
 
 ### Assistant
 
-O Takamine GD20 Dreadnought Natural custa R$ 2.199,00 à vista, ou no PIX sai por R$ 2.089,05. 
+O Takamine GD20 Dreadnought Natural custa R$ 2.199,00, ou R$ 2.089,05 no PIX. Se preferir parcelar, dá para dividir em até 12x de R$ 183,25 sem juros no cartão! 
 
-Se preferir parcelar, dá para dividir em até 12x sem juros de R$ 183,25 no cartão de crédito! O violão está disponível em estoque por aqui. Quer saber mais algum detalhe dele?
+Quer saber mais detalhes dele ou dar uma olhada em outros violões?
 
 Tool calls:
 
-- `search_products {"only_available":true,"query":"Takamine GD20"}`
+- `search_products {"query":"Takamine GD20","only_available":true,"category":"Violões"}`
 
 ### Customer
 
@@ -28,14 +28,19 @@ E o Giannini GF-3D Dreadnought Sunburst?
 
 ### Assistant
 
-Puxa, o Giannini GF-3D Dreadnought Sunburst está temporariamente sem estoque por aqui. O preço dele é R$ 799,90 (ou R$ 759,90 no PIX, parcelado em até 7x sem juros de R$ 114,27).
+O Giannini GF-3D Dreadnought Sunburst está temporariamente sem estoque. 
 
-Mas olha, temos outras opções incríveis de violões disponíveis em estoque que seguem uma faixa de preço parecida, como o **Tagima Kansas** ou o **Rozini RX200**. Quer dar uma olhada neles?
+Mas temos algumas alternativas legais que podem te interessar:
+
+* **Shelby SGD-195E Elétrico Aço Sunburst**: R$ 799,00 (ou R$ 759,05 no PIX), em até 7x de R$ 114,14 sem juros.
+* **Tagima Dallas Tuner Aço Natural**: R$ 749,00 (ou R$ 711,55 no PIX), em até 7x de R$ 107,00 sem juros.
+* **Yamaha C70 Nylon Natural**: R$ 849,00 (ou R$ 806,55 no PIX), em até 8x de R$ 106,12 sem juros.
+
+Curtiu alguma dessas opções?
 
 Tool calls:
 
-- `search_products {"only_available":true,"query":"Giannini GF-3D"}`
-- `search_products {"category":"Violões","query":"Giannini GF-3D","only_available":false}`
+- `search_products {"category":"Violões","query":"Giannini GF-3D","only_available":true}`
 
 ### Customer
 
@@ -43,11 +48,10 @@ E o Shelby SN-7C 7 Cordas Nylon Natural?
 
 ### Assistant
 
-O Shelby SN-7C 7 Cordas Nylon Natural infelizmente foi descontinuado e não faz mais parte do nosso catálogo. 
+O violão Shelby SN-7C 7 Cordas Nylon Natural infelizmente foi descontinuado e não faz mais parte do nosso catálogo. 
 
-Como alternativa para quem busca violões de nylon, temos ótimos modelos disponíveis, como o **Gianinni AWN-13** ou o **Takamine GC1**. Quer que eu te passe os preços e detalhes deles?
+Se quiser dar uma olhada em outras opções de violões que temos disponíveis, posso te mostrar alguns modelos legais!
 
 Tool calls:
 
-- `search_products {"query":"Shelby SN-7C","only_available":true}`
-- `search_products {"only_available":false,"category":"Violões","query":"Shelby SN-7C"}`
+- `search_products {"query":"Shelby SN-7C","only_available":false,"category":"Violões"}`

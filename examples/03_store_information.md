@@ -1,5 +1,7 @@
 # Store information
 
+> **Known issue:** in the last answer, the agent offers to calculate the shipping cost from the customer's address or product, which it cannot do (there is no shipping tool).
+
 Answers from the policy manual in the system prompt, without tools.
 
 - **Model:** gemini-3.5-flash-lite
@@ -12,9 +14,9 @@ Qual o endereço da loja?
 
 ### Assistant
 
-A Empório da Música fica na Rua 14 de Maio, 3200 — Centro, aqui em Campo Grande - MS! 🎸
+A Empório da Música fica na Rua 14 de Maio, 3200 — Centro, em Campo Grande - MS! 
 
-Estamos abertos de segunda a sexta, das 09:00 às 18:00, e aos sábados, das 09:00 às 13:00. Precisa de ajuda para encontrar algum instrumento?
+Estamos abertos de segunda a sexta-feira, das 09:00 às 18:00, e aos sábados, das 09:00 às 13:00. Quer dar uma olhada em algum instrumento por aí?
 
 ### Customer
 
@@ -22,9 +24,7 @@ Até que horas vocês abrem no sábado?
 
 ### Assistant
 
-No sábado nós abrimos das 09:00 às 13:00! 
-
-Aproveita para dar uma passada aqui na loja ou me fala se procura algum instrumento específico que eu te ajudo por aqui mesmo.
+No sábado nós abrimos das 09:00 às 13:00! Passa aqui para dar uma olhada nos nossos instrumentos ou tirar um som com a gente. Precisa de ajuda para encontrar algum modelo específico?
 
 ### Customer
 
@@ -32,11 +32,11 @@ Quanto fica o frete para Cuiabá?
 
 ### Assistant
 
-Para envios fora de Campo Grande, o valor do frete é calculado automaticamente com base no CEP, peso e tamanho do instrumento. 
+Para entregas em Cuiabá e outras cidades fora da região metropolitana de Campo Grande, nós usamos os Correios (PAC e SEDEX) e a transportadora Jadlog! 
 
-Trabalhamos com três modalidades para Cuiabá:
-- **PAC (Correios):** 5 a 12 dias úteis
+Os prazos estimados são:
 - **SEDEX (Correios):** 2 a 5 dias úteis
 - **Jadlog:** 3 a 8 dias úteis
+- **PAC (Correios):** 5 a 12 dias úteis
 
-Todas as modalidades incluem rastreamento e seguro contra extravios e danos! Se quiser pesquisar algum instrumento, me avisa qual você está procurando.
+Todas as modalidades incluem seguro e código de rastreamento. Para calcular o valor exato do frete para o seu CEP, basta nos passar o endereço completo ou o produto que você tem interesse!
