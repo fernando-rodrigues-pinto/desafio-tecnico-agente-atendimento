@@ -43,15 +43,23 @@ pip install -r requirements.txt
 cp .env.example .env   # then set LLM_API_KEY
 ```
 
+The default provider is DeepSeek (`deepseek-flash`); get an API key at https://platform.deepseek.com. Any OpenAI-compatible API works by changing the three `LLM_*` variables in `.env`. For example, Gemini:
+
+```
+LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+LLM_API_KEY=your-gemini-api-key
+LLM_MODEL=gemini-3.5-flash-lite   # or gemini-3.6-flash
+```
+
 ```bash
 python -m src.main           # start the chat ("sair" exits)
 python -m src.main --debug   # also print each tool call
-python -m pytest             # run the tools tests (no API key needed)
+python -m pytest             # run the tests (no API key needed)
 ```
 
 ## Example conversations
 
-The files in `examples/` come from single real runs of `scripts/generate_examples.py` with `gemini-3.5-flash-lite`, with no manual editing of the dialogue. When an answer breaks a rule, the file keeps it as generated and describes the problem in a "Known issue" note at the top.
+The files in `examples/` come from single real runs of `scripts/generate_examples.py` with `deepseek-flash`, with no manual editing of the dialogue. When an answer breaks a rule, the file keeps it as generated and describes the problem in a "Known issue" note at the top.
 
 - `01_product_catalog.md`: catalog search with a price filter, follow-up questions using the conversation memory, and installments.
 - `02_price_and_availability.md`: price of a product, an out-of-stock product and a discontinued product.
@@ -68,6 +76,7 @@ python -m scripts.generate_examples 3    # only conversation 3
 
 ## Technical decisions
 
+- LLM provider: chose `deepseek-flash` (DeepSeek, with thinking mode at its default) as the default model and the model of the final examples over Gemini (`gemini-3.6-flash`, then `gemini-3.5-flash-lite`), which was used during development and dropped because its free-tier quotas blocked testing. The design stays provider-agnostic: the agent only uses the OpenAI-compatible API with native function calling, and the provider is chosen in `.env`, with no provider-specific parameters in the code. Limitation: fields that a provider requires back after a tool call (Gemini's thought signatures, DeepSeek's `reasoning_content`) are kept by appending the assistant message as returned; another provider could need something else.
 - Alternatives for unavailable products: chose to compute them in `search_products` (up to 3 available products of the same category, priced within ±30% of the requested product, closest price first) over letting the LLM search for them, because `gemini-3.5-flash-lite` invented products twice exactly when it had to decide to search for alternatives. Whatever can be deterministic should not depend on the LLM. Limitation: the rule only looks at category and price, so a 7-string nylon guitar can get 6-string steel alternatives.
 
 ## Assumptions and data handling
@@ -92,9 +101,9 @@ python -m scripts.generate_examples 3    # only conversation 3
 ## Known limitations and future work
 
 - Holidays: the store is closed on holidays (manual, section 2), but there is no holiday data, so the open/closed status injected into the prompt only uses weekdays and hours.
-- Free-tier rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), and each question that uses a tool takes 2 requests, so a fast conversation can hit the limit and get the friendly error message.
-- Tone details: the model may add small details that are not in the manual to keep the tone friendly (e.g. inviting the customer "for a coffee" at the store).
-- Rule violations in the examples: in the final run, `gemini-3.5-flash-lite` broke rules in 3 of the 5 example conversations: in 02 it did not offer the alternatives returned for a discontinued product, in 03 it offered to calculate the shipping cost, and in 04 it presented the delivery forecast as the delivery date and did not mention the open legal warranty. No conversation invented products or categories. They are kept as generated, with a "Known issue" note, instead of re-running until a clean answer appears.
+- Rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), which is why Gemini is no longer the default. If it is chosen in `.env`, a fast conversation can hit the limit, since each question that uses a tool takes 2 requests, and get the friendly error message.
+- Tone details: the model may add small details that are not in the manual or in the product data to keep the tone friendly, e.g. inviting the customer "for a coffee" at the store, or calling the Yamaha C70's tone "bem mais encorpado" in `examples/01_product_catalog.md` while its description says "timbre equilibrado".
+- Prompt-only rules: during development with `gemini-3.5-flash-lite`, every rule enforced in code (alternatives for unavailable products, installments, order deadlines, the category list) held in every run, while rules that lived only in the prompt were followed inconsistently (the delivery forecast presented as the delivery date, offers to calculate shipping, and invented products before the alternatives moved into code). The final set, generated once with `deepseek-flash`, has no rule violations, but prompt-only rules remain the weakest part of the design.
 
 ## Use of AI coding assistants
 
