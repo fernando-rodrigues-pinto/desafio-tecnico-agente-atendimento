@@ -45,6 +45,9 @@ PAYMENT_LABELS = {
 
 PIX_FACTOR = 0.95
 MAX_RESULTS = 10
+MAX_INSTALLMENTS = 12
+# (highest installment count of the tier, minimum installment value), manual section 3.1
+INSTALLMENT_TIERS = [(3, 50.0), (6, 80.0), (12, 100.0)]
 WITHDRAWAL_DAYS = 7
 DEFECT_EXCHANGE_DAYS = 30
 LEGAL_WARRANTY_DAYS = 90
@@ -122,7 +125,7 @@ def get_order(order_id: int, email_or_phone: str, reference_date: date) -> dict:
         result["cancellation_note"] = order["notes"]
 
     if pd.notna(order["estimated_delivery"]):
-        result["estimated_delivery"] = order["estimated_delivery"]
+        result["delivery_forecast"] = order["estimated_delivery"]
         receipt = date.fromisoformat(order["estimated_delivery"])
         if order["status"] == "delivered":
             purchase = date.fromisoformat(order["order_date"])
@@ -143,6 +146,15 @@ def get_order(order_id: int, email_or_phone: str, reference_date: date) -> dict:
     return result
 
 
+def calculate_installments(price: float) -> dict:
+    """Return the most interest-free installments allowed for a price and their value."""
+    for count in range(MAX_INSTALLMENTS, 1, -1):
+        minimum = next(value for highest, value in INSTALLMENT_TIERS if count <= highest)
+        if price / count >= minimum:
+            return {"max_installments": count, "installment_value": round(price / count, 2)}
+    return {"max_installments": 1, "installment_value": round(price, 2)}
+
+
 def _product_summary(row: dict) -> dict:
     product_id = int(row["product_id"])
     original_price = round(float(row["price_brl"]), 2)
@@ -160,6 +172,7 @@ def _product_summary(row: dict) -> dict:
         "discount_percent": discount_percent,
         "final_price": final_price,
         "pix_price": pix_price,
+        **calculate_installments(final_price),
         "stock": int(row["stock_quantity"]),
         "status": str(row["status"]),
         "specs": json.loads(row["specs"]),
