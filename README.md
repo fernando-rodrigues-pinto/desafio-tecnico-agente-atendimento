@@ -68,7 +68,7 @@ python -m scripts.generate_examples 3    # only conversation 3
 
 ## Technical decisions
 
-_TBD_
+- Alternatives for unavailable products: chose to compute them in `search_products` (up to 3 available products of the same category, priced within ±30% of the requested product, closest price first) over letting the LLM search for them, because `gemini-3.5-flash-lite` invented products twice exactly when it had to decide to search for alternatives. Whatever can be deterministic should not depend on the LLM. Limitation: the rule only looks at category and price, so a 7-string nylon guitar can get 6-string steel alternatives.
 
 ## Assumptions and data handling
 
@@ -94,7 +94,7 @@ _TBD_
 - Holidays: the store is closed on holidays (manual, section 2), but there is no holiday data, so the open/closed status injected into the prompt only uses weekdays and hours.
 - Free-tier rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), and each question that uses a tool takes 2 requests, so a fast conversation can hit the limit and get the friendly error message.
 - Tone details: the model may add small details that are not in the manual to keep the tone friendly (e.g. inviting the customer "for a coffee" at the store).
-- Rule violations in the examples: in the final run, `gemini-3.5-flash-lite` broke rules in 3 of the 5 example conversations (a wrong minimum installment in 01, products that are not in the catalog in 02, and wind instruments in 05). They are kept as generated, with a "Known issue" note, instead of re-running until a clean answer appears.
+- Rule violations in the examples: in the final run, `gemini-3.5-flash-lite` broke rules in 3 of the 5 example conversations: in 02 it did not offer the alternatives returned for a discontinued product, in 03 it offered to calculate the shipping cost, and in 04 it presented the delivery forecast as the delivery date and did not mention the open legal warranty. No conversation invented products or categories. They are kept as generated, with a "Known issue" note, instead of re-running until a clean answer appears.
 
 ## Use of AI coding assistants
 
