@@ -2,7 +2,7 @@
 
 Log of how AI coding assistants were used in this project: what was asked, what was accepted and what was adjusted. 
 
-**Tool:** Claude (claude.ai, Claude Opus 5.5), used as pair programmer. All generated code and text is reviewed.
+**Tools:** Claude (claude.ai) as technical mentor for planning, specifications and review; Claude Code as the developer for implementation, tests and running the agent. All generated code and text is reviewed.
 
 ## Step 0: Initial setup
 
@@ -42,3 +42,9 @@ Log of how AI coding assistants were used in this project: what was asked, what 
 - **Adjusted:** in the first run, the store information conversation offered to calculate the shipping cost, so I rejected it. Instead of a shipping-specific rule, I generalized the existing one: the agent only looks up products and orders and must never offer anything else. I then regenerated all 5 conversations. The AI found 3 that still broke rules (wrong minimum installment, products not in the catalog, wind instruments); I chose to keep them with a "Known issue" note and document them in the README instead of re-running until a clean answer appeared.
 - **Adjusted (alternatives):** after regenerating, conversation 2 still invented products. The Lite model invented products twice at the same point: when it had to decide to search for alternatives. Instead of switching models, I moved that decision into code: `search_products` now returns the real alternatives (same category, price within ±30%), and I also left the empty categories out of the `category` enum. Principle: whatever can be deterministic should not depend on the LLM. In the final run no conversation invented products or categories; 3 still broke other rules and keep a "Known issue" note.
 - **Adjusted (provider):** I switched the LLM provider from Gemini to DeepSeek (`deepseek-flash`) because the Gemini free-tier quotas kept blocking test runs. The only code changes were a comment and a shorter pause in the example script: the provider is configured in `.env`, and a real run confirmed that DeepSeek's `reasoning_content` is sent back after tool calls. The AI also found that my `.env` still had the Gemini base URL and corrected that line. The final examples were generated with DeepSeek.
+
+## Step 6: README
+
+- **Asked:** a complete README in first person: fixes to the structure and file references, the technical decisions with rejected alternatives, the data findings, limitations and future work, a draft of the AI-assisted workflow section, and a final check following "How to run" in a fresh clone.
+- **Accepted:** the generated sections, after the AI checked every data finding in the CSVs and the evidence counts against this log; it refined two findings (customer 43 has no orders, and product 96 appears in order 4) and gave exact counts instead of approximate ones.
+- **Adjusted:** the "Use of AI coding assistants" section is marked as a draft; I will rewrite it in my own words. The fresh-clone check passed every step; the only addition was the Windows command to activate the virtual environment.
