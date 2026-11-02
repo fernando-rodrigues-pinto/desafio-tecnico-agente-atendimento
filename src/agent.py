@@ -203,7 +203,9 @@ def get_reply(history: list[dict], client: OpenAI, config: dict, debug: bool = F
             if tool_round == MAX_TOOL_ROUNDS:
                 break
 
-            # Dumped as returned, to keep Gemini's thought signatures (extra_content).
+            # Dumped as returned to keep provider-specific fields that must be sent back after
+            # a tool call: Gemini's thought signatures (extra_content) and DeepSeek's
+            # reasoning_content in thinking mode.
             history.append(message.model_dump(exclude_none=True))
             for tool_call in message.tool_calls:
                 result = run_tool(
