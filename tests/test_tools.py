@@ -237,7 +237,7 @@ def test_specs_are_parsed():
     "category",
     ["Instrumentos de Sopro (Madeiras)", "Instrumentos de Sopro (Metais)", "Cordas Orquestrais"],
 )
-def test_empty_category_from_enum_returns_empty_list(category):
+def test_category_without_products_returns_empty_list(category):
     assert search_products(category=category) == {"products": [], "total_found": 0}
 
 
@@ -303,10 +303,14 @@ def test_tool_schemas_match_functions_and_hide_reference_date():
     assert set(get_order_params) == {"order_id", "email_or_phone"}
 
 
-def test_category_enum_has_the_9_names_from_the_csv():
-    path = Path(__file__).resolve().parent.parent / "data" / "categories.csv"
-    with path.open(encoding="utf-8") as file:
-        expected = [row["name"] for row in csv.DictReader(file)]
+def test_category_enum_has_only_the_6_categories_with_products():
+    data = Path(__file__).resolve().parent.parent / "data"
+    with (data / "products.csv").open(encoding="utf-8") as file:
+        used_ids = {row["category_id"] for row in csv.DictReader(file)}
+    with (data / "categories.csv").open(encoding="utf-8") as file:
+        expected = [row["name"] for row in csv.DictReader(file) if row["category_id"] in used_ids]
     search = next(tool for tool in TOOLS if tool["function"]["name"] == "search_products")
-    assert len(expected) == 9
-    assert search["function"]["parameters"]["properties"]["category"]["enum"] == expected
+    enum = search["function"]["parameters"]["properties"]["category"]["enum"]
+    assert len(expected) == 6
+    assert enum == expected
+    assert "Cordas Orquestrais" not in enum

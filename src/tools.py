@@ -24,7 +24,12 @@ ACTIVE_DISCOUNTS = dict(
     )
 )
 CATEGORY_NAMES = dict(zip(CATEGORIES["category_id"], CATEGORIES["name"]))
-CATEGORY_ENUM = [str(name) for name in CATEGORIES["name"]]
+# Only categories with products, so the LLM is not led to offer empty ones.
+CATEGORY_ENUM = [
+    str(name)
+    for category_id, name in zip(CATEGORIES["category_id"], CATEGORIES["name"])
+    if category_id in set(PRODUCTS["category_id"])
+]
 
 ORDER_NOT_VERIFIED = {
     "found": False,
