@@ -26,6 +26,8 @@ requirements.txt  Python dependencies
 data/             original challenge files (never modified)
 data/policies.md  policy manual in Markdown (from the PDF, with the decisions below applied)
 docs/             project documentation
+examples/         example conversations generated from real runs
+scripts/          script that generates the example conversations
 ```
 
 _More folders will be added as the project evolves._
@@ -45,6 +47,23 @@ cp .env.example .env   # then set LLM_API_KEY
 python -m src.main           # start the chat ("sair" exits)
 python -m src.main --debug   # also print each tool call
 python -m pytest             # run the tools tests (no API key needed)
+```
+
+## Example conversations
+
+The files in `examples/` come from single real runs of `scripts/generate_examples.py` with `gemini-3.5-flash-lite`, with no manual editing of the dialogue. When an answer breaks a rule, the file keeps it as generated and describes the problem in a "Known issue" note at the top.
+
+- `01_product_catalog.md`: catalog search with a price filter, follow-up questions using the conversation memory, and installments.
+- `02_price_and_availability.md`: price of a product, an out-of-stock product and a discontinued product.
+- `03_store_information.md`: address, opening hours and shipping, answered from the policy manual without tools.
+- `04_return_request.md`: identity check, order data and the return policy, with deadlines computed in Python.
+- `05_out_of_scope_and_privacy.md`: out-of-scope requests, an instruction override attempt and two failed identity checks.
+
+To regenerate them (requires `.env`; each run calls the LLM, so the answers will differ):
+
+```bash
+python -m scripts.generate_examples      # all conversations
+python -m scripts.generate_examples 3    # only conversation 3
 ```
 
 ## Technical decisions
@@ -75,6 +94,7 @@ _TBD_
 - Holidays: the store is closed on holidays (manual, section 2), but there is no holiday data, so the open/closed status injected into the prompt only uses weekdays and hours.
 - Free-tier rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), and each question that uses a tool takes 2 requests, so a fast conversation can hit the limit and get the friendly error message.
 - Tone details: the model may add small details that are not in the manual to keep the tone friendly (e.g. inviting the customer "for a coffee" at the store).
+- Rule violations in the examples: in the final run, `gemini-3.5-flash-lite` broke rules in 3 of the 5 example conversations (a wrong minimum installment in 01, products that are not in the catalog in 02, and wind instruments in 05). They are kept as generated, with a "Known issue" note, instead of re-running until a clean answer appears.
 
 ## Use of AI coding assistants
 
