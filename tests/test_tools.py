@@ -5,7 +5,14 @@ from pathlib import Path
 
 import pytest
 
-from src.tools import CUSTOMERS, ORDERS, TOOLS, get_order, search_products
+from src.tools import (
+    CUSTOMERS,
+    ORDERS,
+    TOOLS,
+    calculate_installments,
+    get_order,
+    search_products,
+)
 
 REFERENCE_DATE = date(2026, 3, 25)
 
@@ -75,7 +82,10 @@ def test_empty_contact_is_rejected():
 
 
 def test_order_7_only_legal_warranty_is_open():
-    deadlines = order(7)["deadlines"]
+    result = order(7)
+    assert result["delivery_forecast"] == "2026-02-17"
+    assert "estimated_delivery" not in result
+    deadlines = result["deadlines"]
     assert deadlines["withdrawal_or_preference_exchange"] == {"date": "2026-02-24", "open": False}
     assert deadlines["defect_exchange"] == {"date": "2026-03-05", "open": False}
     assert deadlines["legal_warranty"] == {"date": "2026-05-18", "open": True}
@@ -89,6 +99,7 @@ def test_deadline_is_open_on_its_last_day():
 def test_order_8_shipped_is_overdue():
     result = order(8)
     assert result["status"] == "enviado"
+    assert result["delivery_forecast"] == "2026-02-28"
     assert result["delivery_overdue"] is True
     assert "deadlines" not in result
 
@@ -106,7 +117,7 @@ def test_cancelled_order_includes_its_note():
 def test_pending_order_omits_empty_fields():
     result = order(14)
     assert result["status"] == "aguardando confirmação de pagamento"
-    for field in ("tracking_code", "estimated_delivery", "cancellation_note", "deadlines"):
+    for field in ("tracking_code", "delivery_forecast", "cancellation_note", "deadlines"):
         assert field not in result
 
 
@@ -234,6 +245,47 @@ def test_results_are_limited_to_10_with_total_found():
     results = search_products(only_available=False)
     assert len(results["products"]) == 10
     assert results["total_found"] == 65
+
+
+# Installments
+
+
+@pytest.mark.parametrize(
+    "price, count, value",
+    [
+        (40.0, 1, 40.0),  # below R$ 50,00
+        (99.9, 1, 99.9),  # 2x would be 49.95
+        (100.0, 2, 50.0),
+        (149.9, 2, 74.95),
+        (150.0, 3, 50.0),
+        (319.9, 3, 106.63),
+        (320.0, 4, 80.0),
+        (479.9, 5, 95.98),
+        (480.0, 6, 80.0),
+        (699.9, 6, 116.65),
+        (700.0, 7, 100.0),
+        (1199.9, 11, 109.08),
+        (1200.0, 12, 100.0),
+    ],
+)
+def test_installment_tiers(price, count, value):
+    assert calculate_installments(price) == {"max_installments": count, "installment_value": value}
+
+
+def test_installments_of_a_real_product_match_the_csv():
+    path = Path(__file__).resolve().parent.parent / "data" / "products.csv"
+    with path.open(encoding="utf-8") as file:
+        price = next(float(row["price_brl"]) for row in csv.DictReader(file) if row["product_id"] == "95")
+    item = product("Takamine GD20")
+    assert price == 2199.0
+    assert item["max_installments"] == 12
+    assert item["installment_value"] == round(price / 12, 2) == 183.25
+
+
+def test_installments_use_the_promotional_price():
+    item = product("Ohana CK-20")  # 549.00 with 20% off -> 439.20
+    assert item["max_installments"] == 5
+    assert item["installment_value"] == 87.84
 
 
 # Output format and schemas
