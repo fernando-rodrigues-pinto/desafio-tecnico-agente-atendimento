@@ -2,7 +2,7 @@
 
 Log of how AI coding assistants were used in this project: what was asked, what was accepted and what was adjusted. 
 
-**Tool:** Claude (claude.ai, Claude Opus 5.5), used as pair programmer. All generated code and text is reviewed.
+**Tools:** Claude (claude.ai) as technical mentor for planning, specifications and review; Claude Code as the developer for implementation, tests and running the agent. All generated code and text is reviewed.
 
 ## Step 0: Initial setup
 
