@@ -32,7 +32,20 @@ _More folders will be added as the project evolves._
 
 ## How to run
 
-_TBD_
+Requires Python 3.11+.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # then set LLM_API_KEY
+```
+
+```bash
+python -m src.main           # start the chat ("sair" exits)
+python -m src.main --debug   # also print each tool call
+python -m pytest             # run the tools tests (no API key needed)
+```
 
 ## Technical decisions
 
