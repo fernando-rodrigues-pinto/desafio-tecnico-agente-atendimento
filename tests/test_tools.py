@@ -247,6 +247,50 @@ def test_results_are_limited_to_10_with_total_found():
     assert results["total_found"] == 65
 
 
+# Unavailable products and alternatives
+
+
+@pytest.mark.parametrize(
+    "query, product_id, status, alternative_ids",
+    [
+        ("Giannini GF-3D", 96, "active", [107, 82, 86]),  # out of stock, 799.90
+        ("Shelby SN-7C", 113, "discontinued", [86, 87, 107]),  # 749.00
+    ],
+)
+def test_unavailable_product_returns_real_alternatives(query, product_id, status, alternative_ids):
+    result = search_products(query=query)
+    assert result["products"] == []
+    [match] = result["unavailable_matches"]
+    assert (match["id"], match["status"]) == (product_id, status)
+    alternatives = result["alternatives"]
+    assert [item["id"] for item in alternatives] == alternative_ids
+    reference = match["final_price"]
+    for item in alternatives:
+        assert item["category"] == match["category"]
+        assert item["status"] == "active" and item["stock"] > 0
+        assert 0.7 * reference <= item["final_price"] <= 1.3 * reference
+    distances = [abs(item["final_price"] - reference) for item in alternatives]
+    assert distances == sorted(distances)
+
+
+def test_alternatives_are_added_even_with_only_available_false():
+    result = search_products(query="Giannini GF-3D", only_available=False)
+    assert [item["id"] for item in result["products"]] == [96]
+    assert len(result["alternatives"]) == 3
+
+
+def test_query_matching_an_available_product_has_no_alternatives():
+    result = search_products(query="Takamine GD20")
+    assert "alternatives" not in result
+    assert "unavailable_matches" not in result
+
+
+def test_query_matching_nothing_returns_empty_alternatives():
+    result = search_products(query="Fender Precision")
+    assert result["unavailable_matches"] == []
+    assert result["alternatives"] == []
+
+
 # Installments
 
 
