@@ -24,7 +24,12 @@ ACTIVE_DISCOUNTS = dict(
     )
 )
 CATEGORY_NAMES = dict(zip(CATEGORIES["category_id"], CATEGORIES["name"]))
-CATEGORY_ENUM = [str(name) for name in CATEGORIES["name"]]
+# Only categories with products, so the LLM is not led to offer empty ones.
+CATEGORY_ENUM = [
+    str(name)
+    for category_id, name in zip(CATEGORIES["category_id"], CATEGORIES["name"])
+    if category_id in set(PRODUCTS["category_id"])
+]
 
 ORDER_NOT_VERIFIED = {
     "found": False,
@@ -45,6 +50,9 @@ PAYMENT_LABELS = {
 
 PIX_FACTOR = 0.95
 MAX_RESULTS = 10
+MAX_UNAVAILABLE_MATCHES = 3
+MAX_ALTERNATIVES = 3
+ALTERNATIVE_PRICE_RANGE = 0.30  # alternatives cost within ±30% of the unavailable product
 MAX_INSTALLMENTS = 12
 # (highest installment count of the tier, minimum installment value), manual section 3.1
 INSTALLMENT_TIERS = [(3, 50.0), (6, 80.0), (12, 100.0)]
@@ -182,6 +190,33 @@ def _product_summary(row: dict) -> dict:
     return product
 
 
+def _is_available(row: dict) -> bool:
+    return row["status"] == "active" and row["stock_quantity"] > 0
+
+
+def _matches_query(row: dict, words: list[str], category: str | None) -> bool:
+    if category and CATEGORY_NAMES[row["category_id"]] != category:
+        return False
+    name = _normalize(row["name"])
+    return all(word in name for word in words)
+
+
+def _alternatives(reference: dict) -> list[dict]:
+    """Available products of the same category priced close to the reference product."""
+    low = reference["final_price"] * (1 - ALTERNATIVE_PRICE_RANGE)
+    high = reference["final_price"] * (1 + ALTERNATIVE_PRICE_RANGE)
+    candidates = [
+        _product_summary(row)
+        for row in PRODUCTS.to_dict("records")
+        if _is_available(row) and CATEGORY_NAMES[row["category_id"]] == reference["category"]
+    ]
+    candidates = [product for product in candidates if low <= product["final_price"] <= high]
+    candidates.sort(
+        key=lambda product: (abs(product["final_price"] - reference["final_price"]), product["id"])
+    )
+    return candidates[:MAX_ALTERNATIVES]
+
+
 def search_products(
     query: str | None = None,
     category: str | None = None,
@@ -189,17 +224,19 @@ def search_products(
     max_price: float | None = None,
     only_available: bool = True,
 ) -> dict:
-    """Search products, cheapest first, with active promotions applied."""
+    """Search products, cheapest first, with active promotions applied.
+
+    When a query matches no available product, the unavailable matches and real
+    alternatives are added, so the LLM never has to pick alternatives itself.
+    """
     words = _normalize(query or "").split()
+    query_matches = [
+        row for row in PRODUCTS.to_dict("records") if _matches_query(row, words, category)
+    ]
 
     matches = []
-    for row in PRODUCTS.to_dict("records"):
-        if category and CATEGORY_NAMES[row["category_id"]] != category:
-            continue
-        name = _normalize(row["name"])
-        if not all(word in name for word in words):
-            continue
-        if only_available and not (row["status"] == "active" and row["stock_quantity"] > 0):
+    for row in query_matches:
+        if only_available and not _is_available(row):
             continue
         product = _product_summary(row)
         if min_price is not None and product["final_price"] < min_price:
@@ -209,7 +246,13 @@ def search_products(
         matches.append(product)
 
     matches.sort(key=lambda product: (product["final_price"], product["id"]))
-    return {"products": matches[:MAX_RESULTS], "total_found": len(matches)}
+    result = {"products": matches[:MAX_RESULTS], "total_found": len(matches)}
+
+    if words and not any(_is_available(row) for row in query_matches):
+        unavailable = [_product_summary(row) for row in query_matches[:MAX_UNAVAILABLE_MATCHES]]
+        result["unavailable_matches"] = unavailable
+        result["alternatives"] = _alternatives(unavailable[0]) if unavailable else []
+    return result
 
 
 TOOLS = [

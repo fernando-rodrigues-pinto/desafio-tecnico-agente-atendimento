@@ -237,7 +237,7 @@ def test_specs_are_parsed():
     "category",
     ["Instrumentos de Sopro (Madeiras)", "Instrumentos de Sopro (Metais)", "Cordas Orquestrais"],
 )
-def test_empty_category_from_enum_returns_empty_list(category):
+def test_category_without_products_returns_empty_list(category):
     assert search_products(category=category) == {"products": [], "total_found": 0}
 
 
@@ -245,6 +245,50 @@ def test_results_are_limited_to_10_with_total_found():
     results = search_products(only_available=False)
     assert len(results["products"]) == 10
     assert results["total_found"] == 65
+
+
+# Unavailable products and alternatives
+
+
+@pytest.mark.parametrize(
+    "query, product_id, status, alternative_ids",
+    [
+        ("Giannini GF-3D", 96, "active", [107, 82, 86]),  # out of stock, 799.90
+        ("Shelby SN-7C", 113, "discontinued", [86, 87, 107]),  # 749.00
+    ],
+)
+def test_unavailable_product_returns_real_alternatives(query, product_id, status, alternative_ids):
+    result = search_products(query=query)
+    assert result["products"] == []
+    [match] = result["unavailable_matches"]
+    assert (match["id"], match["status"]) == (product_id, status)
+    alternatives = result["alternatives"]
+    assert [item["id"] for item in alternatives] == alternative_ids
+    reference = match["final_price"]
+    for item in alternatives:
+        assert item["category"] == match["category"]
+        assert item["status"] == "active" and item["stock"] > 0
+        assert 0.7 * reference <= item["final_price"] <= 1.3 * reference
+    distances = [abs(item["final_price"] - reference) for item in alternatives]
+    assert distances == sorted(distances)
+
+
+def test_alternatives_are_added_even_with_only_available_false():
+    result = search_products(query="Giannini GF-3D", only_available=False)
+    assert [item["id"] for item in result["products"]] == [96]
+    assert len(result["alternatives"]) == 3
+
+
+def test_query_matching_an_available_product_has_no_alternatives():
+    result = search_products(query="Takamine GD20")
+    assert "alternatives" not in result
+    assert "unavailable_matches" not in result
+
+
+def test_query_matching_nothing_returns_empty_alternatives():
+    result = search_products(query="Fender Precision")
+    assert result["unavailable_matches"] == []
+    assert result["alternatives"] == []
 
 
 # Installments
@@ -303,10 +347,14 @@ def test_tool_schemas_match_functions_and_hide_reference_date():
     assert set(get_order_params) == {"order_id", "email_or_phone"}
 
 
-def test_category_enum_has_the_9_names_from_the_csv():
-    path = Path(__file__).resolve().parent.parent / "data" / "categories.csv"
-    with path.open(encoding="utf-8") as file:
-        expected = [row["name"] for row in csv.DictReader(file)]
+def test_category_enum_has_only_the_6_categories_with_products():
+    data = Path(__file__).resolve().parent.parent / "data"
+    with (data / "products.csv").open(encoding="utf-8") as file:
+        used_ids = {row["category_id"] for row in csv.DictReader(file)}
+    with (data / "categories.csv").open(encoding="utf-8") as file:
+        expected = [row["name"] for row in csv.DictReader(file) if row["category_id"] in used_ids]
     search = next(tool for tool in TOOLS if tool["function"]["name"] == "search_products")
-    assert len(expected) == 9
-    assert search["function"]["parameters"]["properties"]["category"]["enum"] == expected
+    enum = search["function"]["parameters"]["properties"]["category"]["enum"]
+    assert len(expected) == 6
+    assert enum == expected
+    assert "Cordas Orquestrais" not in enum

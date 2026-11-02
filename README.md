@@ -26,6 +26,8 @@ requirements.txt  Python dependencies
 data/             original challenge files (never modified)
 data/policies.md  policy manual in Markdown (from the PDF, with the decisions below applied)
 docs/             project documentation
+examples/         example conversations generated from real runs
+scripts/          script that generates the example conversations
 ```
 
 _More folders will be added as the project evolves._
@@ -41,15 +43,41 @@ pip install -r requirements.txt
 cp .env.example .env   # then set LLM_API_KEY
 ```
 
+The default provider is DeepSeek (`deepseek-flash`); get an API key at https://platform.deepseek.com. Any OpenAI-compatible API works by changing the three `LLM_*` variables in `.env`. For example, Gemini:
+
+```
+LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+LLM_API_KEY=your-gemini-api-key
+LLM_MODEL=gemini-3.5-flash-lite   # or gemini-3.6-flash
+```
+
 ```bash
 python -m src.main           # start the chat ("sair" exits)
 python -m src.main --debug   # also print each tool call
-python -m pytest             # run the tools tests (no API key needed)
+python -m pytest             # run the tests (no API key needed)
+```
+
+## Example conversations
+
+The files in `examples/` come from single real runs of `scripts/generate_examples.py` with `deepseek-flash`, with no manual editing of the dialogue. When an answer breaks a rule, the file keeps it as generated and describes the problem in a "Known issue" note at the top.
+
+- `01_product_catalog.md`: catalog search with a price filter, follow-up questions using the conversation memory, and installments.
+- `02_price_and_availability.md`: price of a product, an out-of-stock product and a discontinued product.
+- `03_store_information.md`: address, opening hours and shipping, answered from the policy manual without tools.
+- `04_return_request.md`: identity check, order data and the return policy, with deadlines computed in Python.
+- `05_out_of_scope_and_privacy.md`: out-of-scope requests, an instruction override attempt and two failed identity checks.
+
+To regenerate them (requires `.env`; each run calls the LLM, so the answers will differ):
+
+```bash
+python -m scripts.generate_examples      # all conversations
+python -m scripts.generate_examples 3    # only conversation 3
 ```
 
 ## Technical decisions
 
-_TBD_
+- LLM provider: chose `deepseek-flash` (DeepSeek, with thinking mode at its default) as the default model and the model of the final examples over Gemini (`gemini-3.6-flash`, then `gemini-3.5-flash-lite`), which was used during development and dropped because its free-tier quotas blocked testing. The design stays provider-agnostic: the agent only uses the OpenAI-compatible API with native function calling, and the provider is chosen in `.env`, with no provider-specific parameters in the code. Limitation: fields that a provider requires back after a tool call (Gemini's thought signatures, DeepSeek's `reasoning_content`) are kept by appending the assistant message as returned; another provider could need something else.
+- Alternatives for unavailable products: chose to compute them in `search_products` (up to 3 available products of the same category, priced within ±30% of the requested product, closest price first) over letting the LLM search for them, because `gemini-3.5-flash-lite` invented products twice exactly when it had to decide to search for alternatives. Whatever can be deterministic should not depend on the LLM. Limitation: the rule only looks at category and price, so a 7-string nylon guitar can get 6-string steel alternatives.
 
 ## Assumptions and data handling
 
@@ -59,7 +87,7 @@ _TBD_
 - Email address: chose the address without the accent over the accented one in section 1.2 because accented domains are rare and error-prone. Limitation: the domain is fictional, so this can't be verified.
 - Installments: chose the tiered rules in section 3.1 (minimum installment R$ 50,00 up to 3x, R$ 80,00 for 4x–6x, R$ 100,00 for 7x–12x) over the flat R$ 100,00 in the section 3 table because 3.1 is more specific, and read "exceto abaixo de R$ 50,00" as a R$ 50,00 minimum. Limitation: that reading is an interpretation, and the original phrase could also mean a minimum purchase value.
 - Partner stores: chose an explicit rule not to name any store over keeping "Sugerir lojas parceiras" because no partners are listed and the LLM could invent one. Limitation: customers asking for accessories get no alternative, and real partners would need a list added.
-- Catalog claims: chose to remove "mais de 300 instrumentos" and the wind and orchestral strings mentions over stating real counts because `data/products.csv` has 65 products in 6 categories, and a count in the prompt would go stale. Limitation: sections 4.4 and 8.3 still mention wind instruments, and `data/categories.csv` keeps 3 empty categories.
+- Catalog claims: chose to remove "mais de 300 instrumentos" and the wind and orchestral strings mentions over stating real counts because `data/products.csv` has 65 products in 6 categories, and a count in the prompt would go stale. Limitation: sections 4.4 and 8.3 still mention wind instruments, and `data/categories.csv` keeps 3 empty categories (they are left out of the `category` enum of `search_products`, so the LLM is not led to offer them).
 - Defects after 30 days: chose to layer the 30-day exchange, the legal warranty and the manufacturer warranty over keeping "acionar a garantia diretamente com o fabricante" because section 8.1 gives 90 days from receipt and the store follows the CDC. Limitation: the manual doesn't describe the process for days 31–90, so the agent can state the warranty applies but not the steps.
 - Free shipping threshold: chose free shipping from R$ 500,00 over charging the fee at exactly that value because neither rule covered it and the customer-favorable reading is safer. Limitation: this is an interpretation, and the manual doesn't say whether the threshold applies before or after discounts.
 - Preference exchanges: chose 7 calendar days from receipt over counting from purchase because section 4.1, the other 7-day rule, counts that way and customers can't judge a product before receiving it. Limitation: this is an interpretation, and `data/orders.csv` has no actual delivery date, so deadlines can only be estimated.
@@ -73,8 +101,9 @@ _TBD_
 ## Known limitations and future work
 
 - Holidays: the store is closed on holidays (manual, section 2), but there is no holiday data, so the open/closed status injected into the prompt only uses weekdays and hours.
-- Free-tier rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), and each question that uses a tool takes 2 requests, so a fast conversation can hit the limit and get the friendly error message.
-- Tone details: the model may add small details that are not in the manual to keep the tone friendly (e.g. inviting the customer "for a coffee" at the store).
+- Rate limits: the free tier of the Gemini API limits requests per minute and per day (the current values are shown only in Google AI Studio), which is why Gemini is no longer the default. If it is chosen in `.env`, a fast conversation can hit the limit, since each question that uses a tool takes 2 requests, and get the friendly error message.
+- Tone details: the model may add small details that are not in the manual or in the product data to keep the tone friendly, e.g. inviting the customer "for a coffee" at the store, or calling the Yamaha C70's tone "bem mais encorpado" in `examples/01_product_catalog.md` while its description says "timbre equilibrado".
+- Prompt-only rules: in our test runs (4 example generations with `gemini-3.5-flash-lite`, 20 conversations), rules enforced in code (alternatives for unavailable products, installments, order deadlines, the category list) never failed, while prompt-only rules were followed inconsistently (the delivery forecast presented as the delivery date, offers to calculate shipping, and invented products before the alternatives moved into code). The final set, generated once with `deepseek-flash`, has no rule violations, but that is a single run, and prompt-only rules remain the weakest part of the design.
 
 ## Use of AI coding assistants
 
