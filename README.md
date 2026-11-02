@@ -21,6 +21,7 @@ Documentation is in English; the agent, data and store policies are in Portugues
 ```
 .env.example      environment variables template (copy to .env)
 requirements.txt  Python dependencies
+AGENTS.md         guidance for AI coding assistants working in the repository
 data/             original challenge files (never modified)
 data/policies.md  policy manual in Markdown (from the PDF, with the decisions below applied)
 docs/             project documentation (AI-assisted workflow log)
