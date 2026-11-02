@@ -21,7 +21,7 @@ from src.agent import (
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 
-REQUEST_PAUSE_SECONDS = 6
+REQUEST_PAUSE_SECONDS = 1
 RATE_LIMIT_PAUSE_SECONDS = 65
 MAX_ATTEMPTS = 3
 
